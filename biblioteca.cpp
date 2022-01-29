@@ -326,7 +326,8 @@ class biblioteca{
                     int f = q.front();
       
                     q.pop();            
-                    for(int vizinho:grafo[f]){
+                    for(pii par:grafo[f]){//pego {peso,vertice}
+                        int vizinho = par.second;
                         if(nivel[vizinho] != -1) continue;
                         pai[vizinho] = f;
                         nivel[vizinho] = nivel[f] + 1;
@@ -345,7 +346,7 @@ class biblioteca{
                     int f = q.front();
                     q.pop();
                     for(int i=0; i< numVertices; i++){
-                        if(grafo[f][i] == 1){
+                        if(grafo[f][i].second == 1){
                             if(nivel[i] != -1) continue;
                             pai[i] = f;
                             nivel[i] = nivel[f] + 1;
