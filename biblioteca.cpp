@@ -1,16 +1,17 @@
 #include <iostream>
+#include <utility>
 #include <stdio.h>
 #include <bits/stdc++.h>
 #include <time.h>
 #include <string>
 using namespace std;
-typedef pair<float, int> pii;
+typedef pair<float,int> pii;
 
 class biblioteca{
     int numVertices,matriz,Grafo_peso;
     int numArestas = 0;
     int peso;
-
+    
     vector<vector<pii>>grafo;
 
     public:
@@ -34,7 +35,7 @@ class biblioteca{
         
         vector<int> input_semPeso(string line){
             string vertice1,vertice2;
-            vector<int> input;
+            vector<int> input(2);
             int v,u,indice;
             for(int i=0; i<line.size(); i++){
                 if(line[i] != ' '){
@@ -42,21 +43,22 @@ class biblioteca{
                 }else{
                     indice=i;
                     v = stoi(vertice1);
-                    input.push_back(v);
+                    input[0] = v;
                     break;
                 }
             }    
             for(int i=indice+1; i<line.size(); i++){
                     vertice2 += line[i];
                     u = stoi(vertice2);
-                    input.push_back(u);            
+                    input[1] = u;            
             }
+          
         return input;
         };
         
         vector<float> input_comPeso(string line){
             string vertice1,vertice2,peso;
-            vector<float> input;
+            vector<float> input(3);
             float v,u,p;
             int indice;
             for(int i=0; i<line.size(); i++){
@@ -65,7 +67,7 @@ class biblioteca{
                 }else{
                     indice=i;
                     v = stoi(vertice1);
-                    input.push_back(v);
+                    input[0] = v;
                     break;
                 }
             }
@@ -75,31 +77,33 @@ class biblioteca{
                 }else{
                     indice=i;
                     u = stoi(vertice2);
-                    input.push_back(u);
+                    input[1] = u;
                     break;
                 }
             }    
             for(int i=indice+1; i<line.size(); i++){
                     peso += line[i];
                     p = stoi(peso);
-                    input.push_back(p);            
+                    input[2] = p;            
             }
-
+       
         return input;
         };
-
+        
         void Insert(){
+           
             int min = -1, max = -1, mediano = -1;
             float medio = 0;
             vector<int>graus(numVertices);
-            vector<int>input_sem_Peso;
-            vector<float>input_com_Peso;
+            vector<int>input_sem_Peso(2);
+            vector<float>input_com_Peso(3);
             string line;
             int v,u;
             float p;
 
             if(matriz == 1){
-                vector<vector<pii>>arestasMatriz(numVertices);
+                cout << "aa" << "\n";
+                vector<vector<pii>>arestasMatriz(numVertices,  vector<pii>(numVertices));
                 while(getline(cin,line)){
                     if(Verifica_input(line)){//verificando que o grafo é sem peso
                         input_sem_Peso = input_semPeso(line);
@@ -128,7 +132,7 @@ class biblioteca{
                     
                 }
                 grafo = arestasMatriz;
-            } else {// representação por lista de adjacências 
+            } /*else {// representação por lista de adjacências 
                 vector<vector<pii>>arestasLista(numVertices);
                 while(getline(cin,line)){ // verificando que o grafo é sem peso
                     if(Verifica_input(line)){
@@ -158,7 +162,7 @@ class biblioteca{
                 }
                 grafo  = arestasLista;
             
-            }
+            }*/
             sort(graus.begin(), graus.end());
             for(int g:graus){
                 medio += g;
@@ -179,7 +183,7 @@ class biblioteca{
             fprintf(arq,"Número de Vértices: %d \nNúmeros de Arestas: %d \n", numVertices, numArestas);
             fprintf(arq,"Grau Mínimo: %d \nGrau Máximo: %d \nGrau Médio: %f \nMediana de Grau: %d \n", min, max, medio,  mediano);
             fclose(arq);
-        };
+        } ;
         
         void GerarArquivoBusca(vector<int> &pai, vector<int> &nivel){
             FILE *arq;
@@ -313,7 +317,7 @@ class biblioteca{
             fclose(arq);
 
         };*/
-
+        /*
         vector<int> bfs(int ini){
             ini--;
             if(matriz == 0){
@@ -358,8 +362,8 @@ class biblioteca{
                 return nivel;
             }
                 
-    };
-
+    };*/
+        /*
         int Distancia(int ini, int fim){
         vector<int> niveis = bfs(ini);
         FILE *arq;
@@ -407,8 +411,8 @@ class biblioteca{
         fclose(arq);
         return diametro;
     }
-    
-    /*   void Tempo(){
+    */
+        /*   void Tempo(){
         int segTotal;
         clock_t  inicio, fim;
         inicio = clock();
@@ -434,14 +438,11 @@ biblioteca::biblioteca(int n, int m){
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
+    printf("a");
     int numVertices,u,v;
+    
     cin >> numVertices;
-    biblioteca teste(numVertices, 0);
-
-
+    biblioteca teste(numVertices, 1);
     teste.Insert();
-
-    //teste.Tempo();
-
     return 0;
 }
