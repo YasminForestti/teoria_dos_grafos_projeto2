@@ -2,46 +2,161 @@
 #include <stdio.h>
 #include <bits/stdc++.h>
 #include <time.h>
+#include <string>
 using namespace std;
+typedef pair<float, int> pii;
 
 class biblioteca{
-    int numVertices;
+    int numVertices,matriz,Grafo_peso;
     int numArestas = 0;
-    int matriz;
-    
-    vector<vector<int>>grafo;
+    int peso;
+
+    vector<vector<pii>>grafo;
+
     public:
         biblioteca(int, int);
         // Insere Grafo
-        void InsertGrafo(){
+        
+        bool Verifica_input(string line){
+            int space=0;
+            for(int i=0;i<line.size();i++){
+                if(line[i] == ' '){
+                    space += 1;
+                }
+            }
+            if(space == 1){
+              peso = 0;
+              return true; //grafo sem peso  
+            } 
+            peso = 1;
+            return false;//grafo com peso
+        }
+        
+        vector<int> input_semPeso(string line){
+            string vertice1,vertice2;
+            vector<int> input;
+            int v,u,indice;
+            for(int i=0; i<line.size(); i++){
+                if(line[i] != ' '){
+                    vertice1 += line[i];
+                }else{
+                    indice=i;
+                    v = stoi(vertice1);
+                    input.push_back(v);
+                    break;
+                }
+            }    
+            for(int i=indice+1; i<line.size(); i++){
+                    vertice2 += line[i];
+                    u = stoi(vertice2);
+                    input.push_back(u);            
+            }
+        return input;
+        };
+        
+        vector<float> input_comPeso(string line){
+            string vertice1,vertice2,peso;
+            vector<float> input;
+            float v,u,p;
+            int indice;
+            for(int i=0; i<line.size(); i++){
+                if(line[i] != ' '){
+                    vertice1 += line[i];
+                }else{
+                    indice=i;
+                    v = stoi(vertice1);
+                    input.push_back(v);
+                    break;
+                }
+            }
+            for(int i=indice+1; i<line.size(); i++){
+                if(line[i] != ' '){
+                    vertice2 += line[i];
+                }else{
+                    indice=i;
+                    u = stoi(vertice2);
+                    input.push_back(u);
+                    break;
+                }
+            }    
+            for(int i=indice+1; i<line.size(); i++){
+                    peso += line[i];
+                    p = stoi(peso);
+                    input.push_back(p);            
+            }
+
+        return input;
+        };
+
+        void Insert(){
             int min = -1, max = -1, mediano = -1;
             float medio = 0;
             vector<int>graus(numVertices);
+            vector<int>input_sem_Peso;
+            vector<float>input_com_Peso;
+            string line;
             int v,u;
+            float p;
+
             if(matriz == 1){
-                vector<vector<int>>arestasMatriz(numVertices , vector<int>(numVertices ));
-                while(cin >> v >> u){
-                    numArestas += 1;
-                    u--;
-                    v--;
-                    graus[u]++;
-                    graus[v]++;
-                    arestasMatriz[v][u] = 1;
-                    arestasMatriz[u][v] = 1;
+                vector<vector<pii>>arestasMatriz(numVertices);
+                while(getline(cin,line)){
+                    if(Verifica_input(line)){//verificando que o grafo é sem peso
+                        input_sem_Peso = input_semPeso(line);
+                        u = input_sem_Peso[0];
+                        v = input_sem_Peso[1];
+                        numArestas += 1;
+                        u--;
+                        v--;
+                        graus[u]++;
+                        graus[v]++;
+                        arestasMatriz[v][u] = {1.0,1};
+                        arestasMatriz[u][v] = {1.0,1};
+                    }else{
+                        input_com_Peso = input_comPeso(line);
+                        u = int(input_com_Peso[0]);
+                        v = int(input_com_Peso[1]);
+                        p = input_com_Peso[2];
+                        numArestas +=1;
+                        u--;
+                        v--;
+                        graus[u]++;
+                        graus[v]++;
+                        arestasMatriz[v][u] = {p,1};
+                        arestasMatriz[u][v] = {p,1};
+                    }
+                    
                 }
                 grafo = arestasMatriz;
-            } else {
-                vector<vector<int>>arestasLista(numVertices);
-                while(cin >> v >> u){
-                    numArestas += 1;
-                    u--;
-                    v--;
-                    graus[u]++;
-                    graus[v]++;
-                    arestasLista[v].push_back(u);
-                    arestasLista[u].push_back(v);
+            } else {// representação por lista de adjacências 
+                vector<vector<pii>>arestasLista(numVertices);
+                while(getline(cin,line)){ // verificando que o grafo é sem peso
+                    if(Verifica_input(line)){
+                        input_sem_Peso = input_semPeso(line);
+                        u = input_sem_Peso[0];
+                        v = input_sem_Peso[1];
+                        numArestas += 1;
+                        u--;
+                        v--;
+                        graus[u]++;
+                        graus[v]++;
+                        arestasLista[v].push_back({1.0,u});
+                        arestasLista[u].push_back({1.0,v});  
+                    }else{// grafo com peso
+                        input_com_Peso = input_comPeso(line);
+                        u = input_com_Peso[0];
+                        v = input_com_Peso[1];
+                        p = input_com_Peso[2];
+                        numArestas +=1;
+                        u --;
+                        v--;
+                        graus[u]++;
+                        graus[v]++;
+                        arestasLista[v].push_back({p,u});
+                        arestasLista[u].push_back({p,v}); 
+                    }
                 }
-                grafo = arestasLista;
+                grafo  = arestasLista;
             
             }
             sort(graus.begin(), graus.end());
@@ -66,7 +181,6 @@ class biblioteca{
             fclose(arq);
         };
         
-
         void GerarArquivoBusca(vector<int> &pai, vector<int> &nivel){
             FILE *arq;
             int i;
@@ -81,6 +195,8 @@ class biblioteca{
             }
             fclose(arq);
         };
+
+        /*
         vector<int> dfs(int ini){
             ini--;
             vector<int>pai(numVertices, -1);
@@ -125,8 +241,8 @@ class biblioteca{
             }
             GerarArquivoBusca(pai, nivel);
             return marcado;
-        };
-        
+        };*/
+        /*    
         void componentesConexos(int ini, vector<int> &componentes, vector<vector<int>> &vertices,int atualComponente){
             vector<int>marcado(numVertices, -1);
             stack<int>s;
@@ -161,8 +277,8 @@ class biblioteca{
                
             }
 
-        };       
-
+        };       */
+        /*
         void conexao(){
             int atualComponente;
             vector<vector<int>>vertices(numVertices);
@@ -196,8 +312,7 @@ class biblioteca{
             cout << lenMenorComp << '\n';
             fclose(arq);
 
-        };
-
+        };*/
 
         vector<int> bfs(int ini){
             ini--;
@@ -244,7 +359,7 @@ class biblioteca{
                 
     };
 
-    int Distancia(int ini, int fim){
+        int Distancia(int ini, int fim){
         vector<int> niveis = bfs(ini);
         FILE *arq;
         arq = fopen("Distancia.txt", "wt");
@@ -253,7 +368,7 @@ class biblioteca{
         return niveis[fim-1];
     }
 
-    int Diametro(){
+        int Diametro(){
         int max = -1;
         for(int i = 1; i <= numVertices; i++){
             vector<int>niveis = bfs(i);
@@ -272,8 +387,8 @@ class biblioteca{
         fclose(arq);
         return max;
     };
-    int DiametroAproximativo(){
-            
+    
+        int DiametroAproximativo(){    
         int numAmostras = log2(numVertices);
         int diametro = -1;
         for (int i = 0; i < numAmostras; i++){
@@ -291,8 +406,8 @@ class biblioteca{
         fclose(arq);
         return diametro;
     }
-
-    void Tempo(){
+    
+    /*   void Tempo(){
         int segTotal;
         clock_t  inicio, fim;
         inicio = clock();
@@ -306,7 +421,7 @@ class biblioteca{
         segTotal = fim - inicio;
         cout << (segTotal)/10 << "\n";
         
-    }
+    }*/
 };
 
 biblioteca::biblioteca(int n, int m){
@@ -323,9 +438,9 @@ int main() {
     biblioteca teste(numVertices, 0);
 
 
-    teste.InsertGrafo();
+    teste.Insert();
 
-    teste.Tempo();
+    //teste.Tempo();
 
     return 0;
 }
