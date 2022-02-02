@@ -12,8 +12,9 @@ typedef pair<float,int> pfi;
 
 class biblioteca{
     int numVertices, peso, neg;
-    
+    vector<vector<int>> matrizPred;
     vector<vector<pfi>>grafo;
+    vector<vector<float>>matrizGrafo;
     vector<int>pais;
     public:
         biblioteca(int);
@@ -69,6 +70,7 @@ class biblioteca{
             string line;
             // grafo.resize(numVertices);    
             vector<vector<pfi>>g(numVertices);
+            vector<vector<float>>matriz(numVertices , vector<float>(numVertices,INF));
             peso = -1;
             neg = 0;
             while(getline(cin,line)){
@@ -106,6 +108,9 @@ class biblioteca{
                     v--;
                     g[u].push_back({p, v});
                     g[v].push_back({p, u});
+                    matriz[v][u] = p;
+                    matriz[u][v] = p;
+
                 } else {
                     string vertice1,vertice2;
                     int v,u,indice;
@@ -130,13 +135,51 @@ class biblioteca{
 
             }
             grafo = g;
-            
+            matrizGrafo = matriz;
         }
+
+    vector<vector<float>> floyd_warshal(){
+        vector<vector<int>>pred(numVertices , vector<int>(numVertices ));
+        vector<vector<float>>matrizFloyd;
+        matrizFloyd = matrizGrafo;
+        
+        for(int i =0; i < numVertices; i++){
+            matrizFloyd[i][i] = 0;
+            for(int j = 0; j < numVertices; j++){
+                if(i == j || matrizFloyd[i][j] == INF){
+                    pred[i][j] = -1;
+                } else {
+                    pred[i][j] = i;
+                }
+            }
+        }
+
+        for(int k =0; k < numVertices; k++)
+            for(int u = 0; u < numVertices; u++)
+                for(int v = 0; v < numVertices; v++)
+                    if(matrizFloyd[u][v] > matrizFloyd[u][k] + matrizFloyd[k][v]){
+                        //verificar se entrou nesse loop na n-ésima primeira iteração para detectar ciclo
+                        matrizFloyd[u][v] = matrizFloyd[u][k] + matrizFloyd[k][v];
+                        pred[u][v] = pred[k][v];
+                    } else {
+                        matrizFloyd[u][v] = matrizFloyd[u][v];
+                    }
+        matrizPred = pred;
+        return matrizFloyd;
+    }       
+
+
         int distancia(int i, int f){
             i--;
             f--;
+            vector<vector<float>>matrizDist;
             if(neg){
-                cout << "floyd" << "\n";
+                cout << "Distancia: " << '\n';
+                matrizDist = floyd_warshal();
+                cout << matrizDist[i][f] << '\n';
+                cout << "Caminho Minimo: " << '\n';
+                //int pai = f;
+
             } else if (peso) {
                 cout << "Distancia: " << '\n';
                 cout << dijkstra(i, f) << '\n';
