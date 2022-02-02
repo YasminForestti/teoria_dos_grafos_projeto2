@@ -9,9 +9,8 @@ using namespace std;
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    float p;
-    p = stof("1"); 
-    cout << p << '\n';
-
+    vector<int>pai;
+    pai.resize(10, -1);
+    cout << pai[1] << '\n';
     return 0;
 }

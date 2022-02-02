@@ -4,17 +4,53 @@
 #include <bits/stdc++.h>
 #include <time.h>
 #include <string>
+#define INF 0x3f3f3f3f
+#define st first
+#define nd second
 using namespace std;
 typedef pair<float,int> pfi;
 
 class biblioteca{
-    int numVertices, peso;
+    int numVertices, peso, neg;
     
     vector<vector<pfi>>grafo;
-
+    vector<int>pais;
     public:
         biblioteca(int);
         
+        float dijkstra(int u, int b){
+            vector<float>dist(numVertices);
+            vector<bool>vis(numVertices);
+            pais.resize(numVertices, -1);
+            for(int i = 0; i < grafo.size(); i++){
+                dist[i] = INF;
+                vis[i] = false;   
+            } 
+            
+            priority_queue <pfi, vector<pfi>, greater<pfi> > q;
+            dist[u] = 0;
+            q.push({dist[u], u});
+            
+            while(!q.empty()) {
+                int f=q.top().nd;
+
+                if(f == b){
+                    return dist[b];
+                }
+                q.pop(), vis[f]=true;
+                for(pfi e: grafo[f]){
+                    float p = e.st;
+                    int v = e.nd;
+                    if (vis[v]) continue;
+                    float novo_dist = dist[f] + p;
+                    if(novo_dist<dist[v]){
+                        dist[v] = novo_dist;
+                        q.push({dist[v],v});
+                        pais[v] = f;
+                    }
+                }
+            }
+        }
         void Verifica_input(string line){
             int space=0;
             for(int i=0;i<line.size();i++){
@@ -34,6 +70,7 @@ class biblioteca{
             // grafo.resize(numVertices);    
             vector<vector<pfi>>g(numVertices);
             peso = -1;
+            neg = 0;
             while(getline(cin,line)){
                 if(!line.size()) continue;
                 if(peso == -1) Verifica_input(line);
@@ -63,7 +100,8 @@ class biblioteca{
                     for(int i=indice+1; i<line.size(); i++){
                         peso_value += line[i];
                     }
-                    p = stof(peso_value);    
+                    p = stof(peso_value);  
+                    if(p < 0) neg = 1;  
                     u--;
                     v--;
                     g[u].push_back({p, v});
@@ -94,7 +132,25 @@ class biblioteca{
             grafo = g;
             
         }
-     
+        int distancia(int i, int f){
+            i--;
+            f--;
+            if(neg){
+                cout << "floyd" << "\n";
+            } else if (peso) {
+                cout << "Distancia: " << '\n';
+                cout << dijkstra(i, f) << '\n';
+                cout << "Caminho Minimo: " << '\n';
+                int pai = f;
+                while(pai != -1){
+                    cout << pai + 1 << " ";
+                    pai = pais[pai];
+                }
+                cout << '\n';
+            } else {
+                cout << "bfs" << '\n';
+            }
+        }     
 };
 
 biblioteca::biblioteca(int n){
@@ -110,5 +166,6 @@ int main() {
     cin >> numVertices;
     biblioteca teste(numVertices);
     teste.Insert();
+    teste.distancia(1, 3);
     return 0;
 }
