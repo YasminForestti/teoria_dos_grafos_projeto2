@@ -109,7 +109,6 @@ class biblioteca{
                     g[u].push_back({p, v});
                     g[v].push_back({p, u});
                     matriz[v][u] = p;
-                    matriz[u][v] = p;
 
                 } else {
                     string vertice1,vertice2;
@@ -138,35 +137,36 @@ class biblioteca{
             matrizGrafo = matriz;
         }
 
-    vector<vector<float>> floyd_warshal(){
-        vector<vector<int>>pred(numVertices , vector<int>(numVertices ));
-        vector<vector<float>>matrizFloyd;
-        matrizFloyd = matrizGrafo;
-        
-        for(int i =0; i < numVertices; i++){
-            matrizFloyd[i][i] = 0;
-            for(int j = 0; j < numVertices; j++){
-                if(i == j || matrizFloyd[i][j] == INF){
-                    pred[i][j] = -1;
-                } else {
-                    pred[i][j] = i;
+        vector<vector<float>> floyd_warshal(){
+            vector<vector<int>>pred(numVertices , vector<int>(numVertices ));
+            vector<vector<float>>matrizFloyd;
+            matrizFloyd = matrizGrafo;
+            
+            for(int i =0; i < numVertices; i++){
+                matrizFloyd[i][i] = 0;
+                for(int j = 0; j < numVertices; j++){
+                    if(i == j || matrizFloyd[i][j] == INF){
+                        pred[i][j] = -1;
+                    } else {
+                        pred[i][j] = i;
+                    }
                 }
             }
-        }
-
-        for(int k =0; k < numVertices; k++)
-            for(int u = 0; u < numVertices; u++)
-                for(int v = 0; v < numVertices; v++)
-                    if(matrizFloyd[u][v] > matrizFloyd[u][k] + matrizFloyd[k][v]){
-                        //verificar se entrou nesse loop na n-ésima primeira iteração para detectar ciclo
-                        matrizFloyd[u][v] = matrizFloyd[u][k] + matrizFloyd[k][v];
-                        pred[u][v] = pred[k][v];
-                    } else {
-                        matrizFloyd[u][v] = matrizFloyd[u][v];
+            for(int k =0; k < numVertices; k++){
+                for(int u = 0; u < numVertices; u++){
+                    for(int v = 0; v < numVertices; v++){
+                        if(matrizFloyd[u][v] > matrizFloyd[u][k] + matrizFloyd[k][v]){
+                            matrizFloyd[u][v] = matrizFloyd[u][k] + matrizFloyd[k][v];
+                            pred[u][v] = pred[k][v];
+                        }
                     }
-        matrizPred = pred;
-        return matrizFloyd;
-    }       
+                    
+                }
+            }
+
+            matrizPred = pred;
+            return matrizFloyd;
+        }       
 
 
         int distancia(int i, int f){
@@ -178,7 +178,12 @@ class biblioteca{
                 matrizDist = floyd_warshal();
                 cout << matrizDist[i][f] << '\n';
                 cout << "Caminho Minimo: " << '\n';
-                //int pai = f;
+                int pai = f;
+                    while(pai != -1){
+                        cout << pai + 1 << " ";
+                        pai = matrizPred[i][pai];
+                    }
+                    cout << '\n';
 
             } else if (peso) {
                 cout << "Distancia: " << '\n';
@@ -209,6 +214,6 @@ int main() {
     cin >> numVertices;
     biblioteca teste(numVertices);
     teste.Insert();
-    teste.distancia(1, 3);
+    teste.distancia(3, 5);
     return 0;
 }
