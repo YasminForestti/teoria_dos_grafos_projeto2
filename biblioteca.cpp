@@ -228,7 +228,7 @@ class biblioteca{
             for(int k =0; k < numVertices; k++){
                 for(int u = 0; u < numVertices; u++){
                     for(int v = 0; v < numVertices; v++){
-                        if(v == u) continue; //desconsidera os ciclos com apenas uma aresta
+                        if(v == u) continue;
                         if(matrizFloyd[u][v] > matrizFloyd[u][k] + matrizFloyd[k][v]){
                             matrizFloyd[u][v] = matrizFloyd[u][k] + matrizFloyd[k][v];
                             pred[u][v] = pred[k][v];
@@ -250,6 +250,13 @@ class biblioteca{
                 cout << "Distancia: " << '\n';
                 matrizDist = floyd_warshal();
                 cout << matrizDist[i][f] << '\n';
+                cout << "Caminho Minimo: " << '\n';
+                int pai = f;
+                while(pai != -1){
+                    cout << pai + 1 << " ";
+                    pai = matrizPred[i][pai];
+                }
+                cout << '\n';
             } else if (peso) {
                 cout << "Distancia: " << '\n';
                 cout << dijkstra(i, f) << '\n';
@@ -279,7 +286,7 @@ int main() {
     cin >> numVertices;
     biblioteca teste(numVertices);
     teste.Insert();
-    teste.Kruskal();
+    teste.distancia(1, 3);
     
     return 0;
 }
