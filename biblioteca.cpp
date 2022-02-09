@@ -72,12 +72,13 @@ class biblioteca{
                 if(Find(u) != Find(v)){
                     total += p;
                     Union(u, v);
-                    fprintf(arq," %d %d %f.2",u+1,v+1,p);
+                    fprintf(arq," %d %d %f",u+1,v+1,p);
                     fprintf(arq,"\n");
                      
                 }
             }
             fclose(arq);
+            cout << total << '\n';
             return total;
         }
 
@@ -173,8 +174,10 @@ class biblioteca{
                     v--;
                     g[u].push_back({p, v});
                     g[v].push_back({p, u});
+                    Vectorarestas.push_back({p, {u, v}});
                     matriz[v][u] = p;
                     matriz[u][v] = p;
+                    numArestas++;
 
                 } else {
                     string vertice1,vertice2;
@@ -196,7 +199,7 @@ class biblioteca{
                     v--;
                     g[u].push_back({1.0, v});
                     g[v].push_back({1.0, u});
-                    Vectorarestas.insert(Vectorarestas.begin(), {1.0, {u, v}});
+                    Vectorarestas.push_back({1.0, {u, v}});
                     numArestas++;
                 }
 
