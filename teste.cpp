@@ -10,7 +10,10 @@ int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
     vector<int>pai;
-    pai.resize(10, -1);
-    cout << pai[1] << '\n';
+    pai.insert(pai.begin(),2);
+    pai.insert(pai.begin(),7);
+    for(int i =0; i<pai.size(); i++){
+        cout<< pai[i] << ' ';
+    }
     return 0;
 }
