@@ -11,14 +11,76 @@ using namespace std;
 typedef pair<float,int> pfi;
 
 class biblioteca{
-    int numVertices, peso, neg;
+    int numVertices,numArestas, peso, neg;
     vector<vector<int>> matrizPred;
     vector<vector<pfi>>grafo;
     vector<vector<float>>matrizGrafo;
     vector<int>pais;
+    vector<int>paiKruskal;
+    vector<int>tamKuskal;
+    vector<pair<float, pair<int, int>>>Vectorarestas;
     public:
         biblioteca(int);
         
+        void init(int n){
+            vector<int>pai(numVertices);
+            vector<int>tam(numVertices);
+            for(int i = 0; i < n; i++){
+                pai[i] = i;
+            }
+            paiKruskal= pai;
+            tamKuskal=tam;
+        }
+
+        int Find(int u){
+            if(u == paiKruskal[u]){
+                return u;
+            }
+            paiKruskal[u] = Find(paiKruskal[u]);
+            return paiKruskal[u];
+        }
+
+
+        void Union(int u, int v){
+            u = Find(u);
+            v = Find(v);
+            if(u == v){
+                return;
+            }
+            if(tamKuskal[u] < tamKuskal[v]){
+                paiKruskal[u] = v;
+                tamKuskal[v] += tamKuskal[u];
+            } else {
+                paiKruskal[v] = u;
+                tamKuskal[u] += tamKuskal[v];
+            }
+        }
+
+        int Kruskal(){
+            //vector<pair<float, pair<int, int>>>arestasKruskal(numArestas);
+            vector<int>pai(numVertices);
+            vector<int>tam(numVertices);
+            init(numVertices);
+            float total =0;
+            sort(Vectorarestas.begin(), Vectorarestas.end());
+            FILE *arq;
+            arq = fopen("MST.txt", "wt");
+            for(int i = 0; i < numArestas; i++){
+                int u = Vectorarestas[i].nd.st;
+                int v = Vectorarestas[i].nd.nd;
+                float p = Vectorarestas[i].st;
+                if(Find(u) != Find(v)){
+                    total += p;
+                    Union(u, v);
+                    fprintf(arq," %d %d %f.2",u+1,v+1,p);
+                    fprintf(arq,"\n");
+                     
+                }
+            }
+            fclose(arq);
+            return total;
+        }
+
         float dijkstra(int u, int b){
             vector<float>dist(numVertices);
             vector<bool>vis(numVertices);
@@ -52,6 +114,7 @@ class biblioteca{
                 }
             }
         }
+        
         void Verifica_input(string line){
             int space=0;
             for(int i=0;i<line.size();i++){
@@ -66,13 +129,15 @@ class biblioteca{
             }
             return;
         }        
+        
         void Insert(){
             string line;
-            // grafo.resize(numVertices);    
             vector<vector<pfi>>g(numVertices);
             vector<vector<float>>matriz(numVertices , vector<float>(numVertices,INF));
             peso = -1;
             neg = 0;
+            int i = 0; 
+            numArestas = 0;
             while(getline(cin,line)){
                 if(!line.size()) continue;
                 if(peso == -1) Verifica_input(line);
@@ -109,7 +174,8 @@ class biblioteca{
                     g[u].push_back({p, v});
                     g[v].push_back({p, u});
                     matriz[v][u] = p;
-
+                    Vectorarestas.insert(Vectorarestas.begin(), {p, {u, v}});
+                    numArestas++;
                 } else {
                     string vertice1,vertice2;
                     int v,u,indice;
@@ -130,11 +196,14 @@ class biblioteca{
                     v--;
                     g[u].push_back({1.0, v});
                     g[v].push_back({1.0, u});
+                    Vectorarestas.insert(Vectorarestas.begin(), {1.0, {u, v}});
+                    numArestas++;
                 }
 
             }
             grafo = g;
             matrizGrafo = matriz;
+
         }
 
         vector<vector<float>> floyd_warshal(){
@@ -214,6 +283,7 @@ int main() {
     cin >> numVertices;
     biblioteca teste(numVertices);
     teste.Insert();
-    teste.distancia(3, 5);
+    teste.Kruskal();
+    
     return 0;
 }
