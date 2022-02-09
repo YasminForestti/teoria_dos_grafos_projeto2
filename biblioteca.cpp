@@ -241,7 +241,27 @@ class biblioteca{
             return matrizFloyd;
         }       
 
-
+        int bfs(int ini, int fim){
+            pais.resize(numVertices, -1);
+            
+            vector<int>nivel(numVertices, -1);
+            queue<int>q;
+            q.push(ini);
+            while (!q.empty()){
+                int f = q.front();
+                if(f == fim) return nivel[f];
+                q.pop();            
+                for(pfi vizinho :grafo[f]){
+                    int u = vizinho.nd;
+                    if(pais[u] != -1) continue;
+                    pais[u] = f;
+                    nivel[u] = nivel[f] + 1;
+                    q.push(u);
+                }
+            }
+            return -1;
+                                  
+    };        
         int distancia(int i, int f){
             i--;
             f--;
@@ -268,7 +288,14 @@ class biblioteca{
                 }
                 cout << '\n';
             } else {
-                cout << "bfs" << '\n';
+                cout << "Distancia: " << '\n';
+                cout << bfs(i,f) << '\n';
+                cout << "Caminho Minimo: " << '\n';
+                int pai = f;
+                while(pai != -1){
+                    cout << pai + 1 << " ";
+                    pai = pais[pai];
+                }
             }
         }     
 };
