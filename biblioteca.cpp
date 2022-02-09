@@ -256,13 +256,14 @@ class biblioteca{
             vector<int>nivel(numVertices, -1);
             queue<int>q;
             q.push(ini);
+            nivel[ini] = 0;
             while (!q.empty()){
                 int f = q.front();
                 if(f == fim) return nivel[f];
                 q.pop();            
                 for(pfi vizinho :grafo[f]){
                     int u = vizinho.nd;
-                    if(pais[u] != -1) continue;
+                    if(nivel[u] != -1) continue;
                     pais[u] = f;
                     nivel[u] = nivel[f] + 1;
                     q.push(u);
@@ -310,6 +311,7 @@ class biblioteca{
                     cout << pai + 1 << " ";
                     pai = pais[pai];
                 }
+                cout << '\n';
             }
         }     
 };
