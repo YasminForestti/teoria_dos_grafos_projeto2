@@ -19,6 +19,7 @@ class biblioteca{
     vector<int>paiKruskal;
     vector<int>tamKuskal;
     vector<pair<float, pair<int, int>>>Vectorarestas;
+    bool negCycle;
     public:
         biblioteca(int);
         
@@ -237,6 +238,14 @@ class biblioteca{
                     
                 }
             }
+            negCycle = false;
+            for(int u = 0; u < numVertices; u++){
+                for(int v = 0; v < numVertices; v++){
+                    if(matrizGrafo[u][v] && pred[u][v] != u && matrizFloyd[u][v] + matrizGrafo[u][v] < 0){
+                        negCycle = true;
+                    }
+                }
+            }
             matrizPred = pred;
             return matrizFloyd;
         }       
@@ -249,14 +258,19 @@ class biblioteca{
             if(neg){
                 cout << "Distancia: " << '\n';
                 matrizDist = floyd_warshal();
-                cout << matrizDist[i][f] << '\n';
-                cout << "Caminho Minimo: " << '\n';
-                int pai = f;
-                while(pai != -1){
-                    cout << pai + 1 << " ";
-                    pai = matrizPred[i][pai];
+                if(!negCycle){
+
+                    cout << matrizDist[i][f] << '\n';
+                    cout << "Caminho Minimo: " << '\n';
+                    int pai = f;
+                    while(pai != -1){
+                        cout << pai + 1 << " ";
+                        pai = matrizPred[i][pai];
+                    }
+                    cout << '\n';
+                } else {
+                    cout << "Distancias nao definidas" << '\n';
                 }
-                cout << '\n';
             } else if (peso) {
                 cout << "Distancia: " << '\n';
                 cout << dijkstra(i, f) << '\n';
