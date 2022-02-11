@@ -269,9 +269,9 @@ class biblioteca{
                     q.push(u);
                 }
             }
-            return -1;
-                                  
+            return -1;                          
     };        
+           
         int distancia(int i, int f){
             i--;
             f--;
@@ -313,7 +313,7 @@ class biblioteca{
                 }
                 cout << '\n';
             }
-        }     
+        }
 };
 
 biblioteca::biblioteca(int n){
