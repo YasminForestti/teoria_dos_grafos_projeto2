@@ -134,8 +134,12 @@ class biblioteca{
         
         void Insert(){
             string line;
-            vector<vector<pfi>>g(numVertices);
-            vector<vector<float>>matriz(numVertices , vector<float>(numVertices,INF));
+            // vector<vector<pfi>>g(numVertices);
+            vector<vector<float>>matriz(numVertices);
+
+            for(int i = 0; i < numVertices; i++){
+                matriz[i] = vector<float>(i+1,INF);
+            }
             peso = -1;
             neg = 0;
             int i = 0; 
@@ -173,11 +177,10 @@ class biblioteca{
                     if(p < 0) neg = 1;  
                     u--;
                     v--;
-                    g[u].push_back({p, v});
-                    g[v].push_back({p, u});
-                    Vectorarestas.push_back({p, {u, v}});
-                    matriz[v][u] = p;
-                    matriz[u][v] = p;
+                    // g[u].push_back({p, v});
+                    // g[v].push_back({p, u});
+                    // Vectorarestas.push_back({p, {u, v}});
+                    u > v? matriz[u][v] = p : matriz[v][u] = p;
                     numArestas++;
 
                 } else {
@@ -198,30 +201,33 @@ class biblioteca{
                     u = stoi(vertice2);      
                     u--;
                     v--;
-                    g[u].push_back({1.0, v});
-                    g[v].push_back({1.0, u});
+                    // g[u].push_back({1.0, v});
+                    // g[v].push_back({1.0, u});
                     Vectorarestas.push_back({1.0, {u, v}});
                     numArestas++;
                 }
 
             }
-            grafo = g;
+            // grafo = g;
             matrizGrafo = matriz;
 
         }
 
         vector<vector<float>> floyd_warshal(){
-            vector<vector<int>>pred(numVertices , vector<int>(numVertices ));
+            vector<vector<int>>pred(numVertices, vector<int>(numVertices));
+    
             vector<vector<float>>matrizFloyd;
             matrizFloyd = matrizGrafo;
             
             for(int i =0; i < numVertices; i++){
                 matrizFloyd[i][i] = 0;
-                for(int j = 0; j < numVertices; j++){
+                for(int j = 0; j < i+1; j++){
                     if(i == j || matrizFloyd[i][j] == INF){
                         pred[i][j] = -1;
+                        pred[j][i] = -1;
                     } else {
                         pred[i][j] = i;
+                        pred[j][i] = j;
                     }
                 }
             }
@@ -230,9 +236,17 @@ class biblioteca{
                 for(int u = 0; u < numVertices; u++){
                     for(int v = 0; v < numVertices; v++){
                         if(v == u) continue;
-                        if(matrizFloyd[u][v] > matrizFloyd[u][k] + matrizFloyd[k][v]){
-                            matrizFloyd[u][v] = matrizFloyd[u][k] + matrizFloyd[k][v];
-                            pred[u][v] = pred[k][v];
+                        float dist_u_v, dist_u_k, dist_k_v;
+                        u > v ? dist_u_v = matrizFloyd[u][v] : dist_u_v = matrizFloyd[v][u];
+                        u > k ? dist_u_k = matrizFloyd[u][k] : dist_u_k = matrizFloyd[k][u];
+                        k > v ? dist_k_v = matrizFloyd[k][v] : dist_k_v = matrizFloyd[v][k];
+                        if(dist_u_v > dist_u_k + dist_k_v){                            
+                            if(u > v){
+                                matrizFloyd[u][v] = dist_u_k + dist_k_v;
+                            } else {
+                                matrizFloyd[v][u] = dist_u_k + dist_k_v;
+                            }
+                            pred[u][v] = pred[k][v]; 
                         }
                     }
                     
@@ -241,7 +255,16 @@ class biblioteca{
             negCycle = false;
             for(int u = 0; u < numVertices; u++){
                 for(int v = 0; v < numVertices; v++){
-                    if(matrizGrafo[u][v] && pred[u][v] != u && matrizFloyd[u][v] + matrizGrafo[u][v] < 0){
+                    float arestaReal, dist_floyd;
+                    if(u > v){
+                        arestaReal = matrizGrafo[u][v];
+                        dist_floyd = matrizFloyd[u][v];
+                    } else {
+                        arestaReal = matrizGrafo[v][u];
+                        dist_floyd = matrizFloyd[v][u];
+                    }
+                    
+                    if(arestaReal && pred[u][v] != u && dist_floyd + arestaReal < 0){
                         negCycle = true;
                     }
                 }
@@ -329,7 +352,10 @@ int main() {
     cin >> numVertices;
     biblioteca teste(numVertices);
     teste.Insert();
-    teste.distancia(1, 3);
-    
+    teste.distancia(1, 10);
+    teste.distancia(1, 20);
+    teste.distancia(1, 30);
+    teste.distancia(1, 40);
+    teste.distancia(1, 50);
     return 0;
 }
