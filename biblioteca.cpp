@@ -249,28 +249,17 @@ class biblioteca{
             for(int k =0; k < numVertices; k++){
                 for(int u = 0; u < numVertices; u++){
                     for(int v = 0; v < numVertices; v++){
-                        if(k == numVertices - 1 && u == numVertices - 1  && v == numVertices - 1){
-                            for(int i = 0; i < 2; i++){
-                                if(matrizFloyd[u][v] > matrizFloyd[u][k]  + matrizFloyd[k][v] ){
-                                    if(i == 1){
-                                        return 1;
-                                    } else {
-                                        matrizFloyd[u][v] =  matrizFloyd[u][k]  + matrizFloyd[k][v];
-                                        pred[u][v] = pred[k][v]; 
-                                    }
-                                }
-                            }
-                        } else {
 
-                            if(matrizFloyd[u][v] > matrizFloyd[u][k]  + matrizFloyd[k][v] ){
-                                matrizFloyd[u][v] =  matrizFloyd[u][k]  + matrizFloyd[k][v];
-                                pred[u][v] = pred[k][v]; 
-                            }
+                        if(matrizFloyd[u][v] > matrizFloyd[u][k]  + matrizFloyd[k][v] ){
+                            matrizFloyd[u][v] =  matrizFloyd[u][k]  + matrizFloyd[k][v];
+                            pred[u][v] = pred[k][v]; 
                         }
                     }
                 }
             }
-            
+
+            for (int i = 0; i < numVertices; i++)
+                if (matrizFloyd[i][i] < 0) return 1;
             matrizPred = pred;
             return 0;
         }       
