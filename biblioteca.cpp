@@ -15,6 +15,7 @@ class biblioteca{
     vector<vector<int>> matrizPred;
     vector<vector<pfi>>grafo;
     vector<vector<float>>matrizGrafo;
+    vector<vector<float>>matrizFloyd;
     vector<int>pais;
     vector<int>paiKruskal;
     vector<int>tamKuskal;
@@ -73,7 +74,7 @@ class biblioteca{
                 if(Find(u) != Find(v)){
                     total += p;
                     Union(u, v);
-                    fprintf(arq," %d %d %f",u+1,v+1,p);
+                    fprintf(arq," %d %d",u+1,v+1);
                     fprintf(arq,"\n");
                      
                 }
@@ -115,6 +116,7 @@ class biblioteca{
                     }
                 }
             }
+            return -1;
         }
         
         void Verifica_input(string line){
@@ -131,15 +133,29 @@ class biblioteca{
             }
             return;
         }        
-        
+
+        void Tempo(){
+            int segTotal;
+            clock_t  inicio, fim;
+            inicio = clock();
+            for(int i = 0; i< 100; i++){
+                srand(i);
+                int verticeAleatorio1 =  (rand() % numVertices) + 1;
+                int verticeAleatorio2 = (rand()%numVertices) + 4;
+                distancia(verticeAleatorio1,verticeAleatorio2);
+            }    
+            fim = clock();
+            segTotal = fim - inicio;
+            cout << (segTotal)/100 << "\n";
+        };
         void Insert(){
             string line;
-            // vector<vector<pfi>>g(numVertices);
-            vector<vector<float>>matriz(numVertices);
+            vector<vector<pfi>>g(numVertices);
+            vector<vector<float>>matriz(numVertices, vector<float>(numVertices, INF));
 
-            for(int i = 0; i < numVertices; i++){
-                matriz[i] = vector<float>(i+1,INF);
-            }
+            // for(int i = 0; i < numVertices; i++){
+            //     matriz[i] = vector<float>(i+1,INF);
+            // }
             peso = -1;
             neg = 0;
             int i = 0; 
@@ -177,10 +193,10 @@ class biblioteca{
                     if(p < 0) neg = 1;  
                     u--;
                     v--;
-                    // g[u].push_back({p, v});
-                    // g[v].push_back({p, u});
-                    // Vectorarestas.push_back({p, {u, v}});
-                    u > v? matriz[u][v] = p : matriz[v][u] = p;
+                    g[u].push_back({p, v});
+                    g[v].push_back({p, u});
+                    Vectorarestas.push_back({p, {u, v}});
+                    matriz[v][u] = p;
                     numArestas++;
 
                 } else {
@@ -201,76 +217,62 @@ class biblioteca{
                     u = stoi(vertice2);      
                     u--;
                     v--;
-                    // g[u].push_back({1.0, v});
-                    // g[v].push_back({1.0, u});
+                    g[u].push_back({1.0, v});
+                    g[v].push_back({1.0, u});
                     Vectorarestas.push_back({1.0, {u, v}});
                     numArestas++;
                 }
 
             }
-            // grafo = g;
+            grafo = g;
             matrizGrafo = matriz;
-
+            return;
         }
 
-        vector<vector<float>> floyd_warshal(){
+        int floyd_warshal(){
             vector<vector<int>>pred(numVertices, vector<int>(numVertices));
-    
-            vector<vector<float>>matrizFloyd;
+
+            // vector<vector<float>>matrizFloyd;
+
             matrizFloyd = matrizGrafo;
-            
             for(int i =0; i < numVertices; i++){
                 matrizFloyd[i][i] = 0;
-                for(int j = 0; j < i+1; j++){
+                for(int j = 0; j < numVertices; j++){
                     if(i == j || matrizFloyd[i][j] == INF){
                         pred[i][j] = -1;
-                        pred[j][i] = -1;
                     } else {
                         pred[i][j] = i;
-                        pred[j][i] = j;
                     }
                 }
             }
-      
+
             for(int k =0; k < numVertices; k++){
                 for(int u = 0; u < numVertices; u++){
                     for(int v = 0; v < numVertices; v++){
-                        if(v == u) continue;
-                        float dist_u_v, dist_u_k, dist_k_v;
-                        u > v ? dist_u_v = matrizFloyd[u][v] : dist_u_v = matrizFloyd[v][u];
-                        u > k ? dist_u_k = matrizFloyd[u][k] : dist_u_k = matrizFloyd[k][u];
-                        k > v ? dist_k_v = matrizFloyd[k][v] : dist_k_v = matrizFloyd[v][k];
-                        if(dist_u_v > dist_u_k + dist_k_v){                            
-                            if(u > v){
-                                matrizFloyd[u][v] = dist_u_k + dist_k_v;
-                            } else {
-                                matrizFloyd[v][u] = dist_u_k + dist_k_v;
+                        if(k == numVertices - 1 && u == numVertices - 1  && v == numVertices - 1){
+                            for(int i = 0; i < 2; i++){
+                                if(matrizFloyd[u][v] > matrizFloyd[u][k]  + matrizFloyd[k][v] ){
+                                    if(i == 1){
+                                        return 1;
+                                    } else {
+                                        matrizFloyd[u][v] =  matrizFloyd[u][k]  + matrizFloyd[k][v];
+                                        pred[u][v] = pred[k][v]; 
+                                    }
+                                }
                             }
-                            pred[u][v] = pred[k][v]; 
+                        } else {
+
+                            if(matrizFloyd[u][v] > matrizFloyd[u][k]  + matrizFloyd[k][v] ){
+                                matrizFloyd[u][v] =  matrizFloyd[u][k]  + matrizFloyd[k][v];
+                                pred[u][v] = pred[k][v]; 
+                            }
                         }
                     }
-                    
                 }
             }
-            negCycle = false;
-            for(int u = 0; u < numVertices; u++){
-                for(int v = 0; v < numVertices; v++){
-                    float arestaReal, dist_floyd;
-                    if(u > v){
-                        arestaReal = matrizGrafo[u][v];
-                        dist_floyd = matrizFloyd[u][v];
-                    } else {
-                        arestaReal = matrizGrafo[v][u];
-                        dist_floyd = matrizFloyd[v][u];
-                    }
-                    
-                    if(arestaReal && pred[u][v] != u && dist_floyd + arestaReal < 0){
-                        negCycle = true;
-                    }
-                }
-            }
+            
             matrizPred = pred;
-            return matrizFloyd;
+            return 0;
         }       
 
         int bfs(int ini, int fim){
@@ -295,48 +297,46 @@ class biblioteca{
             return -1;                          
     };        
            
-        int distancia(int i, int f){
-            i--;
-            f--;
-            vector<vector<float>>matrizDist;
-            if(neg){
-                cout << "Distancia: " << '\n';
-                matrizDist = floyd_warshal();
-                if(!negCycle){
-
-                    cout << matrizDist[i][f] << '\n';
-                    cout << "Caminho Minimo: " << '\n';
-                    int pai = f;
-                    while(pai != -1){
-                        cout << pai + 1 << " ";
-                        pai = matrizPred[i][pai];
-                    }
-                    cout << '\n';
-                } else {
-                    cout << "Distancias nao definidas" << '\n';
-                }
-            } else if (peso) {
-                cout << "Distancia: " << '\n';
-                cout << dijkstra(i, f) << '\n';
+    void distancia(int i, int f){
+        i--;
+        f--;
+        if(neg){
+            cout << "Distancia: " << '\n';
+            int negCycle = floyd_warshal();
+            if(!negCycle){
+                cout << matrizFloyd[i][f] << '\n';
                 cout << "Caminho Minimo: " << '\n';
                 int pai = f;
                 while(pai != -1){
                     cout << pai + 1 << " ";
-                    pai = pais[pai];
+                    pai = matrizPred[i][pai];
                 }
                 cout << '\n';
             } else {
-                cout << "Distancia: " << '\n';
-                cout << bfs(i,f) << '\n';
-                cout << "Caminho Minimo: " << '\n';
-                int pai = f;
-                while(pai != -1){
-                    cout << pai + 1 << " ";
-                    pai = pais[pai];
-                }
-                cout << '\n';
+                cout << "Distancias nao definidas" << '\n';
             }
+        } else if (peso) {
+            cout << "Distancia: " << '\n';
+            cout << dijkstra(i, f) << '\n';
+            cout << "Caminho Minimo: " << '\n';
+            int pai = f;
+            while(pai != -1){
+                cout << pai + 1 << " ";
+                pai = pais[pai];
+            }
+            cout << '\n';
+        } else {
+            cout << "Distancia: " << '\n';
+            cout << bfs(i,f) << '\n';
+            cout << "Caminho Minimo: " << '\n';
+            int pai = f;
+            while(pai != -1){
+                cout << pai + 1 << " ";
+                pai = pais[pai];
+            }
+            cout << '\n';
         }
+    }
 };
 
 biblioteca::biblioteca(int n){
@@ -352,10 +352,6 @@ int main() {
     cin >> numVertices;
     biblioteca teste(numVertices);
     teste.Insert();
-    teste.distancia(1, 10);
-    teste.distancia(1, 20);
-    teste.distancia(1, 30);
-    teste.distancia(1, 40);
-    teste.distancia(1, 50);
+    teste.distancia(1, 3);
     return 0;
 }

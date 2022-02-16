@@ -5,11 +5,11 @@
 #define MAXN 100
 using namespace std;
 typedef pair<int, int>pii;
-int g[MAXN][MAXN];
+
 int pred[MAXN][MAXN];
 int n, m;
 
-void floyd_warshal(){
+void floyd_warshal(vector<vector<float>>&g){
     for(int i =0; i < n; i++){
         for(int j = 0; j < n; j++){
             if(i == j || g[i][j] == INF){
@@ -20,16 +20,21 @@ void floyd_warshal(){
         }
     }
 
-    for(int k =0; k < n+1; k++)
-        for(int u = 0; u < n; u++)
-            for(int v = 0; v < n; v++)
+    for(int k =0; k < n; k++){
+        for(int u = 0; u < n; u++){
+            for(int v = 0; v < n; v++){
+                if((u == v) && (u == pred[v][k])) continue;
                 if(g[u][v] > g[u][k] + g[k][v]){
-                    //verificar se entrou nesse loop na n-ésima primeira iteração para detectar ciclo
+                    cout << "d[" << u << "][" << v << "] = d[" << u << "][" << k << "] + d[" << k << "][" << v << "]";
+                    cout << '\n';
+                    cout << g[u][k] + g[k][v] << '\n';
                     g[u][v] = g[u][k] + g[k][v];
                     pred[u][v] = pred[k][v];
-                } else {
-                    g[u][v] = g[u][v];
                 }
+            }
+        }
+    }
+
 
 }       
 
@@ -39,28 +44,23 @@ int main(){
     ios_base::sync_with_stdio(0);
     cin.tie(0); cout.tie(0);
     cin >> n >> m;
-    memset(g, INF, sizeof g);
+    vector<vector<float>>g(n, vector<float>(n, INF));
+
     for(int u = 0; u < n; u++){
         g[u][u] = 0;
     }
 
     while(m--){
-        int u, v, p;
+        int u, v;
+        float p;
         cin >> u >> v  >> p;
-        g[u][v] = g[v][u] =  p; 
+        u--;
+        v--;
+        g[u][v] =  g[v][u]  = p; 
     }
 
-    floyd_warshal();
-    int i = 0, j = 2;
-    cout << j << '\n';
-    while(true){
-        j = pred[i][j];
-        if(j == -1){
-            break;
-        } else {
-            cout << j << '\n';
-        }
-    }
 
+    floyd_warshal(g);
+    cout << g[0][2] << '\n'; 
     return 0;
 }

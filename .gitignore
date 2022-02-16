@@ -33,3 +33,5 @@
 *.app
 *.txt
 
+# But not this files
+!mst*
